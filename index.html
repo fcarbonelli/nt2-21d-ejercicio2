@@ -8,15 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 
 </head>
 
 
 <div class="container-fluid mt-3" id="app">
-    <input type="text" class="form-control" v-model="criterioDeBusqueda"
-        placeholder="Ingresar un criterio de busqueda...">
+    <input type="text" class="form-control" v-model="criterioDeBusquedaNombre"
+        placeholder="Buscar por Nombre y apellido">
+        <div v-if="!minCaracteres(criterioDeBusquedaNombre)" class="alert" role="alert"> Debe ingresar 3 caracteres al menos</div>
     <br>
+    <input type="text" class="form-control" v-model="criterioDeBusquedaDni"
+        placeholder="Buscar por Email ">
+        <div v-if="!minCaracteres(criterioDeBusquedaDni)" class="alert" role="alert"> Debe ingresar 3 numeros al menos</div>
+
     <div class="card-deck m-0">
         <div class="row">
             <div class="col" v-for="persona in personasFiltradas">
@@ -39,7 +45,8 @@
     new Vue({
         el: '#app',
         data: {
-            criterioDeBusqueda: '',
+            criterioDeBusquedaNombre: '',
+            criterioDeBusquedaDni: '',           
             //Aquí, en este array es donde tienen que agregar su información
             personas: [
                 {
@@ -334,16 +341,34 @@
         },
         computed: {
             personasFiltradas() {
-                return this.personas.filter((persona) => {
-                    let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
-                });
-            }
+                let registroCompleto;
+                if (this.criterioDeBusquedaNombre.length >= 3) {
+                    return this.personas.filter((persona) => {
+                    registroCompleto = `${persona.nombre} ${persona.apellido}`
+                        return registroCompleto.toLowerCase().includes(this.criterioDeBusquedaNombre.toLowerCase())
+                    });
+                }
+                if (this.criterioDeBusquedaDni.length >= 3) {
+                    return this.personas.filter((persona) => {
+                    registroCompleto = `${persona.dni}`
+                        return registroCompleto.includes(this.criterioDeBusquedaDni)
+                    });
+                }               
+            }           
         },
         methods: {
             getNombreCompleto(persona) {
                 return `${persona.nombre} ${persona.apellido}`
+            },
+            minCaracteres(criterio){
+                if (criterio.length >= 3) {
+                    return true;
+                }
+                else{
+                    return false;
+                }
+                
             }
-        }
+        },
     });
 </script>
